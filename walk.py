@@ -1,10 +1,9 @@
 import os, csv
 
-# primary = input("Enter dirfrom which files are not to be deleted")
-# secondary = input("Enter directory from which duplicate files will be deleted")
+primary = input("Enter dirfrom which files are not to be deleted")
+secondary = input("Enter directory from which duplicate files will be deleted")
  
-primary = "./trial"
-secondary = "./some"
+
 
 with open('primary_file_list.csv', 'w', newline='') as file:
 	writer = csv.writer(file)
@@ -69,7 +68,7 @@ if answer == "y":
 			os.remove(path)
 			line_count+=1
 
-	print(f"{line_count} Files removed, freeing up {del_size} bytes od space!")
+	print(f"{line_count} Files removed, freeing up {del_size} bytes of space!")
 
 
 
