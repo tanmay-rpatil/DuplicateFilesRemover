@@ -1,6 +1,6 @@
 import os, csv
 
-primary = input("Enter dirfrom which files are not to be deleted")
+primary = input("Enter directory from which files are not to be deleted")
 secondary = input("Enter directory from which duplicate files will be deleted")
  
 
@@ -12,7 +12,7 @@ with open('primary_file_list.csv', 'w', newline='') as file:
 	for root,dirs,files in os.walk(primary):
 		#print("current dir is-", root)
 		for item in files:
-			f_path = os.path.join(root, item)
+			f_path = os.path.join(root, item)	
 			#print(f"File={item}, Path={f_path}, Size={os.path.getsize(f_path)} ")
 			writer.writerow([item, f_path, os.path.getsize(f_path)])
 
@@ -26,6 +26,10 @@ with open('secondary_file_list.csv', 'w', newline='') as file:
 			f_path = os.path.join(root, item)
 			#print(f"File={item}, Path={f_path}, Size={os.path.getsize(f_path)} ")
 			writer.writerow([item, f_path, os.path.getsize(f_path)])
+
+
+found=0
+
 with open('deletion.csv', 'w', newline='') as file:
 	writer = csv.writer(file) 
 	writer.writerow(["File_Name","Sec_Path","Prim_Path", "Size"])
@@ -35,8 +39,6 @@ with open('deletion.csv', 'w', newline='') as file:
 		for sec_row in sec_csv_reader:
 
 			print("Checking the file-", sec_row)
-
-			found=0
 
 			with open('primary_file_list.csv') as prim_csv:
 
@@ -54,21 +56,20 @@ with open('deletion.csv', 'w', newline='') as file:
 						print("No match")
 					prim_csv_line+=1
 			sec_csv_line+=1
+if found==1:
+	answer = input(f"are you shure you want to remove duplicates from {secondary}? (y/n) ")
+	if answer == "y":
+		with open('deletion.csv') as del_csv:
+			del_csv_reader = csv.DictReader(del_csv)
+			line_count = 1
+			del_size =0
+			for del_line in del_csv_reader:
+				path = del_line["Sec_Path"]
+				temp_size = int(del_line["Size"])
+				del_size+=temp_size
+				os.remove(path)
+				line_count+=1
 
-answer = input(f"are you shure you want to remove duplicates from {secondary}? (y/n) ")
-if answer == "y":
-	with open('deletion.csv') as del_csv:
-		del_csv_reader = csv.DictReader(del_csv)
-		line_count = 1
-		del_size =0
-		for del_line in del_csv_reader:
-			path = del_line["Sec_Path"]
-			temp_size = int(del_line["Size"])
-			del_size+=temp_size
-			os.remove(path)
-			line_count+=1
-
-	print(f"{line_count} Files removed, freeing up {del_size} bytes of space!")
-
-
-
+		print(f"{line_count} Files removed, freeing up {del_size} bytes of space!")
+else:
+	print("No duplicates found amoung the two dirs")
