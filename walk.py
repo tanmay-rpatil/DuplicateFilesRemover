@@ -49,7 +49,7 @@ with open('secondary_file_list.csv', 'w', newline='') as file:
 			writer.writerow([item, f_path, os.path.getsize(f_path)])
 
 
-found=0
+found_number=0
 
 with open('deletion.csv', 'w', newline='') as file:
 	writer = csv.writer(file) 
@@ -71,13 +71,24 @@ with open('deletion.csv', 'w', newline='') as file:
 					if ( (sec_row["File_Name"]==prim_row["File_Name"]) and (sec_row["Size"]==prim_row["Size"]) ):
 						writer.writerow([sec_row["File_Name"], sec_row["Path"],prim_row["Path"], sec_row["Size"]])
 						print("Match found", sec_row)
-						found=1
+						found_number+=1
 						break
 					else:
 						print("No match")
 					prim_csv_line+=1
 			sec_csv_line+=1
-if found==1:
+if found_number !=0:
+	display = input(f"{found_number} duplicates found. Do you want a list of them? (y/n)")
+
+	if display == 'y':
+		with open('deletion.csv') as del_csv:
+			del_csv_reader=csv.DictReader(del_csv)
+			del_csv_line=0
+			for del_row in del_csv_reader:
+				print(f"{del_row['File_Name']}, ({del_row['Size']} bytes)")
+
+
+
 	answer = input(f"are you shure you want to remove duplicates from {secondary}? (y/n) ")
 	if answer == "y":
 		with open('deletion.csv') as del_csv:
