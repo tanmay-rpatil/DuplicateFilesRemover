@@ -1,8 +1,29 @@
 import os, csv
 
-primary = input("Enter directory from which files are not to be deleted")
-secondary = input("Enter directory from which duplicate files will be deleted")
+current_dir = (os.path.abspath(__file__))
+
+count =0
+for letter in current_dir:
+	if letter == '/':
+		count+=1
+if count >1:
+	rev_count = count-1
+	rev_path = ""
+	for i in range(rev_count):
+		rev_path = rev_path + "../"
+else:
+	rev_path = "/"
+
  
+
+
+primary = input("Enter absolute path of directory from which files are not to be deleted(starting with /)")
+secondary = input("Enter absolute path of directory from which duplicate files will be deleted(starting with /)")
+
+primary = rev_path + primary[1:]
+secondary = rev_path + secondary[1:]
+
+print(f"Prim_Path={primary}, Sec_Path={secondary} ")
 
 
 with open('primary_file_list.csv', 'w', newline='') as file:
