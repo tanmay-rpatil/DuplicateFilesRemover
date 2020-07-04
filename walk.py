@@ -2,30 +2,19 @@ import os, csv
 
 current_dir = (os.path.abspath(__file__))
 
-count =0
-for letter in current_dir:
-	if letter == '/':
-		count+=1
-if count >1:
-	rev_count = count-1
-	rev_path = ""
-	for i in range(rev_count):
-		rev_path = rev_path + "../"
-else:
-	rev_path = "/"
+
 
  
 
 
-primary = input("Enter absolute path of directory from which files are not to be deleted(starting with /)")
-secondary = input("Enter absolute path of directory from which duplicate files will be deleted(starting with /)")
-
-primary = rev_path + primary[1:]
-secondary = rev_path + secondary[1:]
-
-print(f"Prim_Path={primary}, Sec_Path={secondary} ")
+primary = input("Enter the absolute path of directory from which files should not be deleted")
+secondary = input("Enter the absolute path of directory from which files are to be deleted")
 
 
+
+print(f"Prim_Path={primary}, Sec_Path={secondary}")
+
+#csv file with list of all files from primary dir
 with open('primary_file_list.csv', 'w', newline='') as file:
 	writer = csv.writer(file)
 	writer.writerow(["File_Name","Path", "Size"])
@@ -37,6 +26,7 @@ with open('primary_file_list.csv', 'w', newline='') as file:
 			#print(f"File={item}, Path={f_path}, Size={os.path.getsize(f_path)} ")
 			writer.writerow([item, f_path, os.path.getsize(f_path)])
 
+#csv file with list of all files from primary dir
 with open('secondary_file_list.csv', 'w', newline='') as file:
 	writer = csv.writer(file)
 	writer.writerow(["File_Name","Path", "Size"])
@@ -49,7 +39,9 @@ with open('secondary_file_list.csv', 'w', newline='') as file:
 			writer.writerow([item, f_path, os.path.getsize(f_path)])
 
 
+#finding duplicates
 found_number=0
+found_size=0
 
 with open('deletion.csv', 'w', newline='') as file:
 	writer = csv.writer(file) 
@@ -59,7 +51,7 @@ with open('deletion.csv', 'w', newline='') as file:
 		sec_csv_line=0
 		for sec_row in sec_csv_reader:
 
-			print("Checking the file-", sec_row)
+			#print("Checking the file-", sec_row)
 
 			with open('primary_file_list.csv') as prim_csv:
 
@@ -71,14 +63,16 @@ with open('deletion.csv', 'w', newline='') as file:
 					if ( (sec_row["File_Name"]==prim_row["File_Name"]) and (sec_row["Size"]==prim_row["Size"]) ):
 						writer.writerow([sec_row["File_Name"], sec_row["Path"],prim_row["Path"], sec_row["Size"]])
 						print("Match found", sec_row)
+						found_size+=int(sec_row["Size"])
 						found_number+=1
 						break
-					else:
-						print("No match")
+					
 					prim_csv_line+=1
 			sec_csv_line+=1
+
+
 if found_number !=0:
-	display = input(f"{found_number} duplicates found. Do you want a list of them? (y/n)")
+	display = input(f"{found_number} duplicates found, amounting to {found_size}bytes. Do you want a list of them? (y/n)")
 
 	if display == 'y':
 		with open('deletion.csv') as del_csv:
