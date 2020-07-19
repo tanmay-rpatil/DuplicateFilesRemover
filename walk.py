@@ -3,17 +3,13 @@ import os, csv
 current_dir = (os.path.abspath(__file__))
 
 
-
- 
-
-
 primary = input("Enter the absolute path of directory from which files should not be deleted")
 secondary = input("Enter the absolute path of directory from which files are to be deleted")
 
-
-
 print(f"Prim_Path={primary}, Sec_Path={secondary}")
 
+
+primary_lst= list()
 #csv file with list of all files from primary dir
 with open('primary_file_list.csv', 'w', newline='') as file:
 	writer = csv.writer(file)
@@ -24,7 +20,18 @@ with open('primary_file_list.csv', 'w', newline='') as file:
 		for item in files:
 			f_path = os.path.join(root, item)	
 			#print(f"File={item}, Path={f_path}, Size={os.path.getsize(f_path)} ")
-			writer.writerow([item, f_path, os.path.getsize(f_path)])
+			data=dict()
+			data["File_Name"]=item
+			data["Path"]= f_path
+			data["Size"]= os.path.getsize(f_path)
+			primary_lst.append(data)
+primary_lst = sorted(primary_lst, key=lambda i: i['File_Name'])
+
+with open('secondary_file_list.csv', 'w', newline='') as file:
+	writer = csv.writer(file)
+	writer.writerow(["File_Name","Path", "Size"])
+	
+
 
 #csv file with list of all files from primary dir
 with open('secondary_file_list.csv', 'w', newline='') as file:
@@ -50,25 +57,32 @@ with open('deletion.csv', 'w', newline='') as file:
 		sec_csv_reader=csv.DictReader(sec_csv)
 		sec_csv_line=0
 		for sec_row in sec_csv_reader:
+			print("Checking the file-", sec_row)
+			found = False
+			low = 0
+			up = len(primary_lst)
+			mid = (up-low)//2
+			while (found==False):
 
-			#print("Checking the file-", sec_row)
+				if (up<low):
+					print("Failed to find")
+					break
 
-			with open('primary_file_list.csv') as prim_csv:
+				mid = low + (up-low)//2
 
-				prim_csv_reader=csv.DictReader(prim_csv)
-				prim_csv_line=0
+				if (  primary_lst[mid]['File_Name']==sec_row['File_Name'] and primary_lst[mid]['Size']==int(sec_row['Size']) ):
+					found_number+=1
+					found_size+=int(sec_row['Size'])
+					writer.writerow([sec_row["File_Name"], sec_row["Path"],primary_lst[mid]["Path"], sec_row["Size"]])
+					print("yes", primary_lst[mid]['File_Name'], sec_row['File_Name'], primary_lst[mid]['Size'], sec_row['Size'])
+					found = True
+					found_index = mid
+					break
 
-				for prim_row in prim_csv_reader:
-
-					if ( (sec_row["File_Name"]==prim_row["File_Name"]) and (sec_row["Size"]==prim_row["Size"]) ):
-						writer.writerow([sec_row["File_Name"], sec_row["Path"],prim_row["Path"], sec_row["Size"]])
-						print("Match found", sec_row)
-						found_size+=int(sec_row["Size"])
-						found_number+=1
-						break
-					
-					prim_csv_line+=1
-			sec_csv_line+=1
+				if (primary_lst[mid]['File_Name']>sec_row['File_Name']):
+					up = mid - 1
+				elif(primary_lst[mid]['File_Name']<sec_row['File_Name']):
+					low = mid + 1 
 
 
 if found_number !=0:
@@ -79,7 +93,7 @@ if found_number !=0:
 			del_csv_reader=csv.DictReader(del_csv)
 			del_csv_line=0
 			for del_row in del_csv_reader:
-				print(f"{del_row['File_Name']}, ({del_row['Size']} bytes)")
+				print(f"{del_row['File_Name']} ({del_row['Size']} bytes),")
 
 
 
@@ -98,4 +112,4 @@ if found_number !=0:
 
 		print(f"{line_count} Files removed, freeing up {del_size} bytes of space!")
 else:
-	print("No duplicates found amoung the two dirs")
+	print("No duplicates found amoung the two dirs") 
