@@ -24,8 +24,9 @@ with open('primary_file_list.csv', 'w', newline='') as file:
 			data["File_Name"]=item
 			data["Path"]= f_path
 			data["Size"]= os.path.getsize(f_path)
+			data["Sorting_Key"]=data["File_Name"]+"_"+str(data["Size"])
 			primary_lst.append(data)
-primary_lst = sorted(primary_lst, key=lambda i: i['File_Name'])
+primary_lst = sorted(primary_lst, key=lambda i: i["Sorting_Key"])
 
 with open('secondary_file_list.csv', 'w', newline='') as file:
 	writer = csv.writer(file)
@@ -62,27 +63,27 @@ with open('deletion.csv', 'w', newline='') as file:
 			low = 0
 			up = len(primary_lst)
 			mid = (up-low)//2
+			key = sec_row["File_Name"]+"_"+sec_row["Size"]
 			while (found==False):
-
 				if (up<low):
 					print("Failed to find")
 					break
-
 				mid = low + (up-low)//2
-
-				if (  primary_lst[mid]['File_Name']==sec_row['File_Name'] and primary_lst[mid]['Size']==int(sec_row['Size']) ):
+				if (  primary_lst[mid]["Sorting_Key"]==key ):
 					found_number+=1
 					found_size+=int(sec_row['Size'])
 					writer.writerow([sec_row["File_Name"], sec_row["Path"],primary_lst[mid]["Path"], sec_row["Size"]])
-					print("yes", primary_lst[mid]['File_Name'], sec_row['File_Name'], primary_lst[mid]['Size'], sec_row['Size'])
+					print("yes", key)
 					found = True
 					found_index = mid
 					break
 
-				if (primary_lst[mid]['File_Name']>sec_row['File_Name']):
+				if (primary_lst[mid]['Sorting_Key']>key):
 					up = mid - 1
-				elif(primary_lst[mid]['File_Name']<sec_row['File_Name']):
+				elif(primary_lst[mid]['Sorting_Key']<key):
 					low = mid + 1 
+				
+					
 
 
 if found_number !=0:
@@ -111,5 +112,7 @@ if found_number !=0:
 				line_count+=1
 
 		print(f"{line_count} Files removed, freeing up {del_size} bytes of space!")
+	else:
+		print("No files deleted")
 else:
 	print("No duplicates found amoung the two dirs") 

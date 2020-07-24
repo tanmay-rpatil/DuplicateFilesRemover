@@ -1,2 +1,3 @@
 *.csv
-./Web/
+/Web/
+.env
