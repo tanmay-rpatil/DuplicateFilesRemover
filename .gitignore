@@ -1,3 +1,4 @@
 *.csv
 /Web/
 .env
+__pycache__

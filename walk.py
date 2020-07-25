@@ -1,10 +1,12 @@
 import os, csv
+from functions import subdir_check
 
 current_dir = (os.path.abspath(__file__))
 
-
 primary = input("Enter the absolute path of directory from which files should not be deleted")
 secondary = input("Enter the absolute path of directory from which files are to be deleted")
+
+subdir_check(primary, secondary)
 
 print(f"Prim_Path={primary}, Sec_Path={secondary}")
 
@@ -83,8 +85,6 @@ with open('deletion.csv', 'w', newline='') as file:
 				elif(primary_lst[mid]['Sorting_Key']<key):
 					low = mid + 1 
 				
-					
-
 
 if found_number !=0:
 	display = input(f"{found_number} duplicates found, amounting to {found_size}bytes. Do you want a list of them? (y/n)")
