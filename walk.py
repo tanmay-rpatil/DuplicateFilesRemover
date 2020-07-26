@@ -6,13 +6,15 @@ current_dir = (os.path.abspath(__file__))
 primary = input("Enter the absolute path of directory from which files should not be deleted")
 secondary = input("Enter the absolute path of directory from which files are to be deleted")
 
-subdir_check(primary, secondary)
+while ( subdir_check(primary, secondary) ):
+	primary = input("Enter the absolute path of directory from which files should not be deleted")
+	secondary = input("Enter the absolute path of directory from which files are to be deleted")
 
 print(f"Prim_Path={primary}, Sec_Path={secondary}")
 
 
 primary_lst= list()
-#csv file with list of all files from primary dir
+#data str with list of all files from primary dir
 with open('primary_file_list.csv', 'w', newline='') as file:
 	writer = csv.writer(file)
 	writer.writerow(["File_Name","Path", "Size"])
@@ -27,6 +29,7 @@ with open('primary_file_list.csv', 'w', newline='') as file:
 			data["Path"]= f_path
 			data["Size"]= os.path.getsize(f_path)
 			data["Sorting_Key"]=data["File_Name"]+"_"+str(data["Size"])
+			writer.writerow([item, f_path, data["Size"]])
 			primary_lst.append(data)
 primary_lst = sorted(primary_lst, key=lambda i: i["Sorting_Key"])
 
